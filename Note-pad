@@ -1,0 +1,49 @@
+import kivy
+from kivy.app import App
+from kivy.uix.widget import Widget
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.textinput import TextInput
+from kivy.uix.button import Button
+from kivy.uix.filechooser import FileChooserIconView
+
+kivy.require('2.0.0')
+
+class NotePadWidget(BoxLayout):
+    def __init__(self, **kwargs):
+        super().__init__(orientation='vertical', **kwargs)
+
+        self.text_input = TextInput(hint_text="Start writing...", size_hint=(1, 0.9), font_size=18)
+        self.add_widget(self.text_input)
+
+        button_layout = BoxLayout(size_hint=(1, 0.1))
+
+        save_button = Button(text="Save", on_press=self.save_note)
+        load_button = Button(text="Load", on_press=self.load_note)
+        clear_button = Button(text="Clear", on_press=self.clear_note)
+
+        button_layout.add_widget(save_button)
+        button_layout.add_widget(load_button)
+        button_layout.add_widget(clear_button)
+
+        self.add_widget(button_layout)
+
+    def save_note(self, instance):
+        with open("note.txt", "w") as f:
+            f.write(self.text_input.text)
+
+    def load_note(self, instance):
+        try:
+            with open("note.txt", "r") as f:
+                self.text_input.text = f.read()
+        except FileNotFoundError:
+            self.text_input.text = "No saved notes found."
+
+    def clear_note(self, instance):
+        self.text_input.text = ""
+
+class NotePadApp(App):
+    def build(self):
+        return NotePadWidget()
+
+if __name__ == '__main__':
+    NotePadApp().run()
